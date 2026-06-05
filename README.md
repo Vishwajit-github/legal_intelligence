@@ -219,9 +219,7 @@ legal_intelligence/
 │       └── router.py              # Conditional route after validation
 ├── prompts/
 │   ├── __init__.py                # Active legal specialist and supervisor prompts
-│   ├── validator_prompt.py        # Active legal validator prompt
-│   ├── planner_prompt.py          # Legacy healthcare planner prompt, not active
-│   └── critique_prompt.py         # Legacy healthcare critique prompt, not active
+│   └── validator_prompt.py        # Active legal validator prompt
 ├── src/
 │   ├── agents/                    # Supervisor and legal specialist agents
 │   ├── tools/                     # Legal retrieval, document, clause, summary, search tools
