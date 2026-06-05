@@ -113,23 +113,7 @@ Implementation note: the state class is still named `HealthcareState`, and uploa
 
 The active graph has two executable nodes and one conditional router.
 
-```text
-START
-  |
-  v
-supervisor
-  |
-  v
-validator
-  |
-  +-- if valid --------------------> END
-  |
-  +-- if iteration >= 3 -----------> END
-  |
-  +-- if retry_allowed is false ---> END
-  |
-  +-- otherwise -------------------> supervisor
-```
+![Document Processing](images/langgraph_workflow.png)
 
 Graph behavior:
 
@@ -185,6 +169,8 @@ Primary tool:
 
 - `legal_research_retrieval_tool`
 
+---
+
 ### Legal Clause Extraction Agent
 
 File: `src/agents/legal_clause_extraction_agent.py`
@@ -200,6 +186,8 @@ Primary tools:
 
 - `legal_clause_extraction_tool`
 - `legal_research_retrieval_tool` for internal legal material when no document is supplied
+
+---
 
 ### Contract Analysis Agent
 
@@ -217,6 +205,8 @@ Primary tools:
 
 - `contract_document_retrieval_tool`
 - `web_search_tool`
+
+---
 
 ### Legal Compliance Agent
 
@@ -236,6 +226,8 @@ Primary tools:
 - `legal_research_retrieval_tool`
 - `legal_clause_extraction_tool`
 
+---
+
 ### Litigation Strategy Agent
 
 File: `src/agents/litigation_strategy_agent.py`
@@ -254,6 +246,8 @@ Primary tools:
 - `contract_document_retrieval_tool`
 - `legal_research_retrieval_tool`
 
+---
+
 ### Legal Summarization Agent
 
 File: `src/agents/legal_summarization_agent.py`
@@ -269,6 +263,8 @@ Primary tool:
 
 - `summarize_contract_document`
 
+---
+
 ### Document Drafting Agent
 
 File: `src/agents/legal_document_drafting_agent.py`
@@ -283,6 +279,8 @@ Purpose:
 Primary tool:
 
 - `web_search_tool`
+
+---
 
 ### Legal Risk Assessment Agent
 
