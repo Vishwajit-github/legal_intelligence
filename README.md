@@ -4,7 +4,7 @@
 
 This repository implements a legal-focused multi-agent AI system that accepts legal questions and optional uploaded legal documents, routes the work to specialist agents, validates the result, and returns a structured legal intelligence response.
 
-> Safety note: this project is a legal information, contract intelligence, and drafting-assistance prototype. It is not legal advice, not a substitute for qualified counsel, and must not be used as the final authority for legal decisions.
+> Safety note: this project is a legal information, contract intelligence, and drafting-assistance prototype. It is not a substitute for qualified counsel.
 
 ---
 ## ⚖️ 1. Problem Statement
