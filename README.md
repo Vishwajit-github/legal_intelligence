@@ -108,7 +108,7 @@ Key differentiators:
 
 ---
 
-## 4. Mult-Agentic Architecture
+## 4. Multi-Agentic Architecture
 
 The system is supervisor-centered. The Supervisor Agent receives the user request and decides which specialist agent or agents should handle the work.
 
