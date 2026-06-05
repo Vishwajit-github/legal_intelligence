@@ -1,0 +1,4 @@
+{
+  "user_query": "A UAE healthcare app collects symptoms, prescriptions, insurance IDs, location data, and chat transcripts; it hosts data abroad, shares analytics with partners, and has only generic consent wording. Research health-data/privacy obligations, assess cross-border and partner-sharing risks, identify compliance gaps, and draft consent, privacy notice, security, retention, breach, and processor clauses.",
+  "run_id": "legal-input-07-healthcare-app-data-compliance"
+}

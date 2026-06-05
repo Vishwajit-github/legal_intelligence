@@ -1,0 +1,59 @@
+{
+    "use_case_id": "21",
+    "agents": [
+        {
+            "name": "Supervisor Agent",
+            "role": "Coordinates the legal workflow, interprets the user request, selects relevant specialist agents, manages handoffs, and prepares the final response for validation."
+        },
+        {
+            "name": "Legal Research Agent",
+            "role": "Researches UAE laws, regulations, legal provisions, authorities, and legal concepts to answer legal research questions with relevant source-grounded context."
+        },
+        {
+            "name": "Legal Clause Extraction Agent",
+            "role": "Extracts, identifies, classifies, and locates clauses or provisions from contracts, agreements, policies, and other structured legal documents."
+        },
+        {
+            "name": "Contract Analysis Agent",
+            "role": "Reviews contracts for structure, relevant sections, ambiguity, missing clauses, unusual provisions, and document-specific contract analysis questions."
+        },
+        {
+            "name": "Legal Compliance Agent",
+            "role": "Assesses legal and regulatory compliance, identifies gaps, missing obligations, weak provisions, and compliance recommendations for legal documents or scenarios."
+        },
+        {
+            "name": "Litigation Strategy Agent",
+            "role": "Analyzes disputes, claims, legal positions, evidence, timelines, strengths, weaknesses, and strategic considerations for litigation or formal proceedings."
+        },
+        {
+            "name": "Legal Summarization Agent",
+            "role": "Summarizes contracts, agreements, legal documents, clauses, policies, laws, obligations, restrictions, and key provisions in a concise readable format."
+        },
+        {
+            "name": "Document Drafting Agent",
+            "role": "Drafts legal documents, clauses, templates, amendments, memorandums, and agreement language based on user requirements and legal context."
+        },
+        {
+            "name": "Legal Risk Assessment Agent",
+            "role": "Identifies and evaluates contractual, regulatory, operational, financial, and legal risks from documents, clauses, facts, or business scenarios."
+        },
+        {
+            "name": "Validator Agent",
+            "role": "Validates output quality, completeness, grounding, consistency, safety, and responsible legal framing before final response generation."
+        }
+    ],
+    "tools_used": [
+        "langgraph",
+        "langchain",
+        "fastapi",
+        "compass-api",
+        "custom-medical-tools"
+    ],
+    "data_sources": [
+        "https://uaelegislation.gov.ae/en/constitution",
+        "https://www.mohre.gov.ae/en/laws-and-regulations/laws.aspx",
+        "lhttps://uaelegislation.gov.ae/en/legislations/1529",
+        "https://cdn.expatwoman.com/s3fs-public/UAE%20Penal%20Code.pdf"
+    ],
+    "output_type": "text"
+}
