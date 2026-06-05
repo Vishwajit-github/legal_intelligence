@@ -32,6 +32,7 @@ numpy
 pypdf
 PyPDF2
 PyMuPDF
+tiktoken
 faiss-cpu
 Pillow
 openslide-python

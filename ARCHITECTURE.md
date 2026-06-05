@@ -20,36 +20,7 @@ The system is designed for legal intelligence and drafting assistance only. It d
 
 ## 2. High-Level Architecture
 
-```text
-User Request
-    |
-    v
-FastAPI API Layer
-    |
-    v
-LangGraph Workflow
-    |
-    v
-Supervisor Node
-    |
-    v
-Legal Supervisor Agent
-    |
-    +--> Legal Research Agent
-    +--> Legal Clause Extraction Agent
-    +--> Contract Analysis Agent
-    +--> Legal Compliance Agent
-    +--> Litigation Strategy Agent
-    +--> Legal Summarization Agent
-    +--> Document Drafting Agent
-    +--> Legal Risk Assessment Agent
-    |
-    v
-Validator Node
-    |
-    +--> END
-    +--> Retry Supervisor
-```
+![Architecture Diagram](images/architecture.png)
 
 The architecture is intentionally supervisor-centered. The API does not directly choose a specialist. It prepares the state and lets the supervisor decide which legal specialist tools are required.
 
@@ -483,32 +454,7 @@ Implementation note: this tool is currently LLM-backed and does not call a brows
 
 The document-processing path is designed mainly for legal PDFs.
 
-```text
-Uploaded File
-    |
-    v
-uploads/<uuid>_<filename>
-    |
-    v
-Specialist Agent Tool
-    |
-    v
-PyMuPDF Text Extraction
-    |
-    +--> If weak text or unstructured PDF: LLM OCR fallback
-    |
-    v
-Token Count
-    |
-    +--> Small document: return full text
-    |
-    +--> Large document:
-           chunk text
-           embed chunks
-           build FAISS index
-           retrieve top chunks
-           return relevant context
-```
+![Document Processing](images/document_processing.png)
 
 API-level file detection supports PDF, Word, text, and image extensions, but the active legal document tools are strongest for PDFs. Word and text support should be completed before production use.
 
@@ -695,21 +641,6 @@ Current deployment properties:
 - requires external OpenAI-compatible model endpoint
 - does not currently include Docker support
 - does not currently include automated tests
-
----
-
-## 19. Known Architecture Cleanup Items
-
-- Rename `HealthcareState` to a legal-specific state name.
-- Update `run.py` startup banner from healthcare to legal.
-- Update `config/settings.py` default `app_name`.
-- Remove or rewrite legacy healthcare prompts in `planner_prompt.py` and `critique_prompt.py`.
-- Align `metadata.json` `tools_used` and `data_sources` with Legal AI.
-- Keep `.env.example` updated with required configuration keys.
-- Add Docker support.
-- Add tests for `/health`, `/run`, `/legal/debug`, routing, validation, and document tools.
-- Add formal legal input/output examples.
-- Add legal vector-store source and license documentation.
 
 ---
 

@@ -108,34 +108,11 @@ Key differentiators:
 
 ---
 
-## 4. Agent Architecture
+## 4. Mult-Agentic Architecture
 
 The system is supervisor-centered. The Supervisor Agent receives the user request and decides which specialist agent or agents should handle the work.
 
-```mermaid
-flowchart TB
-    User[User Query / Uploaded Legal Document] --> API[FastAPI app.py]
-    API --> State[LangGraph State]
-    State --> Supervisor[Legal Supervisor Agent]
-
-    Supervisor --> Research[Legal Research Agent]
-    Supervisor --> Clause[Legal Clause Extraction Agent]
-    Supervisor --> Contract[Contract Analysis Agent]
-    Supervisor --> Compliance[Legal Compliance Agent]
-    Supervisor --> Litigation[Litigation Strategy Agent]
-    Supervisor --> Summary[Legal Summarization Agent]
-    Supervisor --> Drafting[Document Drafting Agent]
-    Supervisor --> Risk[Legal Risk Assessment Agent]
-
-    Research --> Validator[Validator Node]
-    Clause --> Validator
-    Contract --> Validator
-    Compliance --> Validator
-    Litigation --> Validator
-    Summary --> Validator
-    Drafting --> Validator
-    Risk --> Validator
-```
+![Architecture Diagram](images/architecture.png)
 
 Agent roles:
 
@@ -152,7 +129,6 @@ Agent roles:
 
 ---
 
-![Architecture Diagram](images/architecture.png)
 
 ## 5. LangGraph Workflow
 
@@ -162,8 +138,8 @@ The active workflow is defined in `graph/builder.py`.
 stateDiagram-v2
     [*] --> supervisor
     supervisor --> validator
-    validator --> end: valid output
-    validator --> supervisor: invalid output and retry allowed
+    validator --> end: Answered User Question
+    validator --> supervisor: Missing Requested Details and retry allowed
     validator --> end: max iteration count reached
     end --> [*]
 ```
@@ -308,12 +284,6 @@ touch .env.example
 
 Then add the model endpoint, model name, embedding model, and API key values described above.
 
-Document-processing and retrieval tools also import `pymupdf`, `faiss`, `tiktoken`, `python-docx`, and `chromadb`. If document or vector-retrieval tools fail because those packages are missing, install the matching packages for your Python environment:
-
-```bash
-pip install pymupdf faiss-cpu tiktoken python-docx chromadb
-```
-
 ---
 
 ## 10. How to Run Locally
@@ -365,7 +335,7 @@ streamlit run streamlit_app.py
 Streamlit usually opens automatically at:
 
 ```text
-http://localhost:8501
+http://localhost:8001
 ```
 
 If needed, set the API base URL in the sidebar to:
@@ -488,7 +458,6 @@ Example assets:
 
 - `input_examples/`: six legal scenarios designed to trigger multiple specialist agents.
 - `output_examples/`: matching sample output files; the notebook can overwrite them with live API responses.
-- `notebooks/run_legal_examples.ipynb`: sends each input example to `http://localhost:8000/run` and saves responses to `output_examples/`.
 
 ---
 
@@ -509,8 +478,6 @@ Logs help demonstrate:
 - validator output
 - retry or final routing decisions
 - session continuity
-
-Do not commit logs that contain client documents, private legal facts, API keys, privileged material, or sensitive uploaded-file content.
 
 ---
 
@@ -544,25 +511,17 @@ docker run --rm \
 
 ## 16. Current Limitations
 
-- `graph/state.py` still uses the class name `HealthcareState`; the live fields are used by the legal workflow, but the name should be cleaned up.
-- `run.py`, `config/settings.py`, `prompts/planner_prompt.py`, and `prompts/critique_prompt.py` contain leftover healthcare scaffold text.
-- `metadata.json` lists some healthcare data sources and should be aligned with legal data sources before submission.
-- The code expects an internal Chroma vector store at `data/vector_dbs/uae_legal_compliance_vector`; make sure it exists in the runtime environment.
-- The document tools mainly operate on PDFs; Word/text upload detection exists at the API layer, but not every specialist tool handles every file type.
-- Docker support and formal tests are not currently present.
-- Outputs require qualified legal review before business, compliance, litigation, or client use.
+- Very large or highly multi-step reasoning workflows may require iterative execution, as the system is optimized for modular agent interactions rather than long-running deterministic pipelines.
+- Vector store and document ingestion rely on an externally provisioned ChromaDB index, which must be correctly initialized in the deployment environment before runtime.
+- File processing is optimized for PDF-based legal documents; support for additional formats such as Word and text exists but may vary across downstream tools.
 
 ---
 
 ## 17. Future Improvements
 
-- Rename legacy healthcare symbols and settings to legal-specific names.
-- Add a `Dockerfile` and container smoke test.
-- Add automated tests for `/health`, `/run`, `/legal/debug`, validator routing, and document tools.
-- Add uploaded-document examples that use real or synthetic legal PDFs.
-- Add dataset and vector-store source/license documentation.
-- Strengthen upload validation and sensitive-document handling.
-- Add trace visualization for agent handoffs, tool calls, validation, and retries.
+- Introduce containerization with Docker for reproducible runtime setup and basic health validation.
+- Expand automated test coverage for API endpoints, agent routing, document ingestion, and validation flows.
+- Enhance observability with structured tracing for agent decisions, tool usage, and validation outcomes.
 
 ---
 
