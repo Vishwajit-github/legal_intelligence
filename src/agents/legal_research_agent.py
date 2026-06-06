@@ -72,8 +72,16 @@ User Query:
  
 """
 
-    result = legal_research_specialist_.invoke({'messages':prompt})
-
+    result = legal_research_specialist_.invoke(
+         {
+            "messages": [
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ]
+        }
+    )
     final_output = result["messages"][-1].content
     
     print("\nFinished Agent: Legal Research Agent")

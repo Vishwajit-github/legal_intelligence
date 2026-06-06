@@ -12,6 +12,8 @@ import faiss
 from langchain_community.tools import tool
 from langchain_core.messages import HumanMessage
 from config import model, llm, openai_client, embeddings
+from typing import Optional, List
+
 
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -251,116 +253,59 @@ def extract_page_llm(page):
 # =========================================================
 import json
 
-def extract_clause_numbers_llm(query: str):
+def extract_legal_regex_llm(document_text: str,  articles: list[str] | None = None):
 
     prompt = f"""
-You are a legal intent detection system.
+You are a legal text pattern extraction system.
 
-Your job:
-Detect whether the user is referring to LEGAL DOCUMENT REFERENCES.
+Your Job is only to return regex pattern associated with articles, clause or section specific numbers.
+You will be provided with numbers specific to clause or articles also,
 
 Legal references include:
-- clauses (e.g., 3.2, 4.1.1)
-- articles
-- sections
-- rules
-- laws
-- provisions
+- Articles (e.g., Article 10, Art. 10)
+- Clauses (e.g., Clause 3.2, Cl. 3.2)
+- Sections (e.g., Section 5, Sec. 5)
+
+
+OR it can be any other wordings used instead of article, clauses. Like Law, Chapter as well. So you need to analyze what words are there in Text and what articles need to extract and then create regex that can help me to extract chunks of relevant sections.
 
 STRICT RULES:
-- If the number is about sports, marks, salary, score, quantity → NOT legal
-- Only extract numbers if clearly tied to legal document structure
+- Do NOT explain anything
+- Do NOT return text
+- Do NOT guess formats not present in the document
+- Return ONLY valid JSON
+- Regex must be Python-compatible
 
-Examples:
-"clause 3.2 termination" → VALID → ["3.2"]
-"article 10 of agreement" → VALID → ["10"]
-"who scored 100 runs" → INVALID → []
-"salary 5000 AED" → INVALID → []
+Keep Simple Regex , if there are multiple articles then make sure regex handles all.
 
+---
 
-Examples:
+Return format:
 
-Query: "clause 3.2 termination"
-→
 {{
-  "is_legal": true,
-  "numbers": ["3", "3.2"]
-}}
-
-Query: "section 9.1 b obligations"
-→
-{{
-  "is_legal": true,
-  "numbers": ["9", "9.1", "9.1 b"]
-}}
-
-Query: "article 10 of agreement"
-→
-{{
-  "is_legal": true,
-  "numbers": ["10"]
-}}
-
-Query: "who scored 100 runs"
-→
-{{
-  "is_legal": false,
-  "numbers": []
+  "regex":"<your regex output>"
 }}
 
 
-Return ONLY valid JSON:
-{{
-  "is_legal": true/false,
-  "numbers": []
-}}
 
-Query:
-{query}
+---
+
+Text:
+{document_text}
+
+Articles/Clauses Need to extract
+{articles}
 """
 
     resp = llm.invoke(prompt)
-
-    # extract raw text
     text = resp.content.strip()
 
-    # safe JSON parsing
     try:
         return json.loads(text)
-    except:
-        return {
-            "is_legal": False,
-            "numbers": []
+    except Exception:
+        return {"regex":""
         }
-
-# =========================================================
-# NUMERIC SEARCH
-# =========================================================
-def search_numeric(chunks: List[str], numbers: List[str]):
-
-    matches = []
-    seen_chunks = set()
-
-    for i, chunk in enumerate(chunks):
-
-        norm = chunk.replace("\n", " ")
-
-        for num in numbers:
-
-            pattern = rf"(?<!\d){re.escape(num)}\.?(?!\d)"
-
-            if re.search(pattern, norm):
-
-                # current chunk + next 2 chunks
-                for j in range(i, min(i + 3, len(chunks))):
-
-                    if j not in seen_chunks:
-                        seen_chunks.add(j)
-                        matches.append(chunks[j])
-
-                break  # avoid re-processing same chunk for other numbers
-
-    return matches
+        
 # =========================================================
 # EMBEDDINGS
 # =========================================================
@@ -407,26 +352,31 @@ def retrieve(index, chunks, q_vec):
 
 
 @tool
-def legal_clause_extraction_tool(pdf_path: str, user_query: str):
+def legal_clause_extraction_tool(pdf_path: str, user_query: str,  articles: Optional[List[str]] = None) -> str:
 
     """
     Tool Name : process_pdf_for_clauses
     Legal clause extraction tool for user-provided PDF documents.
-
+    
     This tool works ONLY on the PDF file provided via `pdf_path`.
     It is used to extract relevant clauses, articles, sections,
     or provisions based on the user's query.
+
+    Args:
+        pdf_path (str): Path to user-uploaded PDF document.
+        user_query (str): User question about clauses or sections.
+        articles: List of article numbers or clause numbers that explicitely mentioned by user OR articles that need to search. This can contain like Parts, Sections, Chapters etc. The naming can be different , not necessarily 'article' always.
+
+
+    Returns:
+        list[str]: Relevant text chunks from the same document.
 
     It first tries to detect legal clause references (e.g., 3.2, Article 10).
     If found, it performs direct matching on the document.
     Otherwise, it falls back to semantic (embedding-based) search.
 
-    Args:
-        pdf_path (str): Path to user-uploaded PDF document.
-        user_query (str): User question about clauses or sections.
+    If user asks for articles/clauses specific to UAE rules without uploading any document, then legal_research_tool is the go to tool.
 
-    Returns:
-        list[str]: Relevant text chunks from the same document.
     """
     print("\n" + "=" * 60)
     print(f"[START] {pdf_path}")
@@ -476,23 +426,64 @@ def legal_clause_extraction_tool(pdf_path: str, user_query: str):
     if token_count <= 7000:
         return full_text
 
-    result = extract_clause_numbers_llm(user_query)
-    is_legal = result.get("is_legal", False)
-    numbers = result.get("numbers", [])
-
-    print(f"[CLAUSE] legal={is_legal}, numbers={numbers}")
-
-    matches = []
-    if is_legal and numbers:
-        matches = search_numeric(chunks, numbers)
-
     vectors = embed_texts(chunks)
     index = build_index(vectors)
     q_vec = embed_query(user_query)
 
     retrieved = retrieve(index, chunks, q_vec) or []
+    retrieved_text = "\n\n".join(retrieved)
+    
+    matches = []
+    
+    print(f"Articles {articles}")
+    
+        # =========================================================
+    # STEP 3: REGEX + ARTICLE MODE (IF PROVIDED)
+    # =========================================================
+    if articles:
 
-    final_chunks = matches + retrieved
+        print("\n==============================")
+        print("🔎 REGEX EXTRACTION MODE")
+        print("==============================")
+
+        print(f"Total number of chunks {len(chunks)}")
+        # Convert semantic context → text for regex generation
+        context_text = retrieved_text
+
+        # 3.1 Get regex from LLM
+        regex_response = extract_legal_regex_llm(context_text, articles)
+        regex_pattern = regex_response.get("regex", "")
+
+        print(f"[DEBUG] Generated Regex: {regex_pattern}")
+
+        # =====================================================
+        # STEP 5: APPLY REGEX SEARCH
+        # =====================================================
+        print("\n🔍 Running regex-based search...")
+
+        matches = []
+
+        if regex_pattern:
+
+            pattern = re.compile(regex_pattern, re.IGNORECASE)
+
+            for i, chunk in enumerate(chunks):
+                input_chunk=chunk.lower()
+                if pattern.search(input_chunk):
+
+                    print(f"📄 Regex Match Found in Chunk {i}")
+
+                    matches.append(chunk)
+
+        print(f"\n✅ REGEX MATCHES FOUND: {len(matches)}")
+
+        # =====================================================
+        # STEP 6: MERGE RESULTS
+        # =====================================================
+        retrieved = matches + retrieved
+    
+
+    final_chunks = retrieved
     
     seen = set()
     deduped = []

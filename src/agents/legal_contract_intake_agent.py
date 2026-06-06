@@ -50,9 +50,16 @@ User Query:
 Document Path={document_path}
 
 """
-    print(f"Incoming Query: {user_legal_query}")
-    result = contract_analysis_specialist_.invoke({'messages':prompt})
-    
+    result = contract_analysis_specialist_.invoke(
+           {
+            "messages": [
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ]
+        }
+    )
     final_output = result["messages"][-1].content
     
     print("\nFinished Agent: Contract Analysis Agent")
