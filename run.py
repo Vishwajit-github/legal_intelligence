@@ -1,9 +1,10 @@
 # run.py (enhanced version)
 
 import uvicorn
-from app import app
+from scripts.legal_complaince_vectordb import ensure_vector_db
 
 if __name__ == "__main__":
+    ensure_vector_db()
 
     print("\n" + "=" * 60)
     print("   Healthcare Multi-Agent System Starting")
