@@ -51,7 +51,8 @@
         "faiss-cpu",
         "PyMuPDF",
         "tiktoken",
-        "python-docx"
+        "python-docx",
+        "compass-api"
     ],
     "data_sources": [
         "https://uaelegislation.gov.ae/en/constitution",
