@@ -43,11 +43,15 @@
         }
     ],
     "tools_used": [
-        "langgraph",
         "langchain",
+        "langgraph",
         "fastapi",
-        "compass-api",
-        "custom-medical-tools"
+        "openai",
+        "chromadb",
+        "faiss-cpu",
+        "PyMuPDF",
+        "tiktoken",
+        "python-docx"
     ],
     "data_sources": [
         "https://uaelegislation.gov.ae/en/constitution",
