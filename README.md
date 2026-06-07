@@ -256,16 +256,28 @@ Do not commit real API keys or private credentials.
 
 ## 9. Setup Instructions
 
+Clone the repository:
+
+```bash
+git clone https://github.com/Vishwajit-github/legal_intelligence.git
+```
+
+Go to the project directory:
+
+```bash
+cd legal_intelligence
+```
+
 Create a virtual environment:
 
 ```bash
-python -m venv .venv
+python3 -m venv venv
 ```
 
 Activate it:
 
 ```bash
-source .venv/bin/activate
+source venv/bin/activate
 ```
 
 Install dependencies:
