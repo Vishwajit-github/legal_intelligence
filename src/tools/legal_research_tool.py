@@ -139,7 +139,7 @@ def legal_research_retrieval_tool(query: str, articles: Optional[List[str]] = No
 
      Args:
         query: User question with supporting details, within maximum 2 lines, with supporting information.
-        articles: List of article numbers or clause numbers that explicitely mentioned by user OR articles that need to search. This can contain like Parts, Sections, Chapters etc. The naming can be different , not necessarily 'article' always.
+        articles: List of article numbers or clause numbers that explicitely mentioned by user OR articles that need to search. This can contain like Parts, Sections, Chapters etc. The naming can be different , not necessarily 'article' always. Dont add keyterms or keywords under this arg, unless it is referred to number of an article/clause/section/chapter. if no such numerical reference, leave it blank list.
 
      Output: Context associated to User Question
 
@@ -263,6 +263,11 @@ Document {i+1}
                     print(f"📄 Regex Match Found in Chunk {i}")
 
                     matches.append(chunk)
+
+                    # 👉 also append next chunk if it exists
+                    if i + 1 < len(chunks):
+                        print(f"📄 Adding Next Chunk {i+1}")
+                        matches.append(chunks[i + 1])
 
         print(f"\n✅ REGEX MATCHES FOUND: {len(matches)}")
 

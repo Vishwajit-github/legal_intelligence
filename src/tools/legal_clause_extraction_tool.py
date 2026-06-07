@@ -365,7 +365,7 @@ def legal_clause_extraction_tool(pdf_path: str, user_query: str,  articles: Opti
     Args:
         pdf_path (str): Path to user-uploaded PDF document.
         user_query (str): User question about clauses or sections.
-        articles: List of article numbers or clause numbers that explicitely mentioned by user OR articles that need to search. This can contain like Parts, Sections, Chapters etc. The naming can be different , not necessarily 'article' always.
+        rticles: List of article numbers or clause numbers that explicitely mentioned by user OR articles that need to search. This can contain like Parts, Sections, Chapters etc. The naming can be different , not necessarily 'article' always. Dont add keyterms or keywords under this arg, unless it is referred to number of an article/clause/section/chapter. if no such numerical reference, leave it blank list.
 
 
     Returns:
