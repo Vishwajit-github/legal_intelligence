@@ -188,7 +188,6 @@ if response:
         st.json(response)
     else:
         st.divider()
-        st.subheader("Final Response")
         st.write(response.get("final_response", "No final response returned."))
 
         st.subheader("Specialist Agent Outputs")
